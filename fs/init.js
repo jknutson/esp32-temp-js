@@ -26,7 +26,10 @@ let ow = OneWire.create(oneWirePin);
 let n = 0;
 let rom = ['01234567'];
 
-ADC.enable(voltagePin);
+if (voltagePin != "") {
+  print('voltagePin set, voltage reading enabled');
+  ADC.enable(voltagePin);
+}
 
 print('deviceId:', deviceId)
 print('oneWirePin:', oneWirePin)
@@ -77,10 +80,11 @@ GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function
 
 
 Timer.set(pollInterval, true, function() {
+  let now = Timer.now();
+
+  // read system stats
   let totalRam = Sys.total_ram();
   let freeRam = Sys.free_ram();
-
-  let now = Timer.now();
   let sysPayload = {
     series: [
       {
@@ -102,6 +106,7 @@ Timer.set(pollInterval, true, function() {
   print('publishing: ' + JSON.stringify(sysPayload))
   postMetric(datadogApiKey, sysPayload);
 
+  // read temperature
   if (DS18B20.connected()) {
     let t = DS18B20.get();
     if (isNaN(t)) {
@@ -126,25 +131,25 @@ Timer.set(pollInterval, true, function() {
     print('no oneWire device found')
   }
 
-  // read voltage
-  let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
-  let voltage = adcReadVoltage(voltagePin);
-  print('voltage: ', voltage);
-  let voltagePayload = {
-    series: [
-      {
-        metric: 'mos.voltage',
-        points: [[now, multiplyVoltage(voltage)]],
-        host: datadogHostName,
-        tags: metricTags,
-        type: 'gauge'
-      }
-    ]
-  };
-  print('publishing: ' + JSON.stringify(voltagePayload))
-  postMetric(datadogApiKey, voltagePayload);
-
-
+  if (voltagePin != "") {
+    // read voltage
+    let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
+    let voltage = adcReadVoltage(voltagePin);
+    print('voltage: ', voltage);
+    let voltagePayload = {
+      series: [
+        {
+          metric: 'mos.voltage',
+          points: [[now, multiplyVoltage(voltage)]],
+          host: datadogHostName,
+          tags: metricTags,
+          type: 'gauge'
+        }
+      ]
+    };
+    print('publishing: ' + JSON.stringify(voltagePayload))
+    postMetric(datadogApiKey, voltagePayload);
+  }
 }, null);
 
 Event.addGroupHandler(Net.STATUS_GOT_IP, function(ev, evdata, ud) {
