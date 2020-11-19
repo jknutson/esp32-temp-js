@@ -1,5 +1,4 @@
 load('api_adc.js');
-load('api_arduino_onewire.js');
 load('api_config.js');
 load('api_events.js');
 load('api_gpio.js');
@@ -12,27 +11,31 @@ load('api_ds18b20.js');
 let deviceId = Cfg.get('device.id');
 let deviceType = 'esp32';
 let metricTags = ['device:' + deviceId, 'deviceType:' + deviceType];
-let oneWirePin = Cfg.get('pins.temp');
 let buttonPin = Cfg.get('pins.builtin');  // builtin
 let voltagePin = Cfg.get('pins.voltage');
 let pollInterval = Cfg.get('interval') * 1000;
 let datadogApiKey = Cfg.get('datadog.api_key');
 let datadogHostName = Cfg.get('datadog.host_name');
+let lcdAddr = 0x27;
+let lcdNumRows = 4;
+let lcdNumCols = 20;
 
 let r1 = Cfg.get('pins.voltage_r1'); // r1 of voltage divider (ohm)
-let r2 = 2200; // r2 of voltage divider (ohm)
+let r2 = Cfg.get('pins.voltage_r2'); // r2 of voltage divider (ohm)
 
-let ow = OneWire.create(oneWirePin);
-let n = 0;
-let rom = ['01234567'];
-
-if (voltagePin != "" && r1 != -1 && r2 != -1) {
+if (voltagePin !== "" && r1 > 0 && r2 > 0) {
   print('voltage reading enabled');
   ADC.enable(voltagePin);
 }
 
+// setup LCD
+let lcd = LCD_I2C.create(lcdAddr);
+lcd.begin(lcdNumRows, lcdNumCols);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print('starting up...')
+
 print('deviceId:', deviceId)
-print('oneWirePin:', oneWirePin)
 
 let postMetric = function(datadogApiKey, payload) {
   print('publishing: ' + JSON.stringify(payload))
@@ -131,7 +134,7 @@ Timer.set(pollInterval, true, function() {
     print('no oneWire device found')
   }
 
-  if (voltagePin != "" && r1 > 0 && r2 > 0) {
+  if (voltagePin !== "" && r1 > 0 && r2 > 0) {
     // read voltage
     let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
     let voltage = adcReadVoltage(voltagePin);
@@ -150,4 +153,8 @@ Timer.set(pollInterval, true, function() {
     print('publishing: ' + JSON.stringify(voltagePayload))
     postMetric(datadogApiKey, voltagePayload);
   }
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print('voltage: ', voltage);
 }, null);
