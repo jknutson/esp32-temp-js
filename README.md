@@ -15,6 +15,8 @@ mos config-set datadog.api_key=API_KEY
 or
 
 ```sh
+cp .env.example .env.local
+# place appropriate values in .env.local
 make configure
 ```
 

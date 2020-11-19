@@ -19,15 +19,15 @@ let pollInterval = Cfg.get('interval') * 1000;
 let datadogApiKey = Cfg.get('datadog.api_key');
 let datadogHostName = Cfg.get('datadog.host_name');
 
-let r1 = 10000; // r1 of voltage divider (ohm)
+let r1 = Cfg.get('pins.voltage_r1'); // r1 of voltage divider (ohm)
 let r2 = 2200; // r2 of voltage divider (ohm)
 
 let ow = OneWire.create(oneWirePin);
 let n = 0;
 let rom = ['01234567'];
 
-if (voltagePin != "") {
-  print('voltagePin set, voltage reading enabled');
+if (voltagePin != "" && r1 != -1 && r2 != -1) {
+  print('voltage reading enabled');
   ADC.enable(voltagePin);
 }
 
@@ -48,7 +48,7 @@ let postMetric = function(datadogApiKey, payload) {
   });
 };
 
-let multiplyVoltage = function(rawVoltage) {
+let multiplyVoltage = function(rawVoltage, r1, r2) {
   return (rawVoltage * (r1 + r2) / r2);
 };
 
@@ -131,7 +131,7 @@ Timer.set(pollInterval, true, function() {
     print('no oneWire device found')
   }
 
-  if (voltagePin != "") {
+  if (voltagePin != "" && r1 > 0 && r2 > 0) {
     // read voltage
     let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
     let voltage = adcReadVoltage(voltagePin);
@@ -140,7 +140,7 @@ Timer.set(pollInterval, true, function() {
       series: [
         {
           metric: 'mos.voltage',
-          points: [[now, multiplyVoltage(voltage)]],
+          points: [[now, multiplyVoltage(voltage, r1, r2)]],
           host: datadogHostName,
           tags: metricTags,
           type: 'gauge'
@@ -150,12 +150,4 @@ Timer.set(pollInterval, true, function() {
     print('publishing: ' + JSON.stringify(voltagePayload))
     postMetric(datadogApiKey, voltagePayload);
   }
-}, null);
-
-Event.addGroupHandler(Net.STATUS_GOT_IP, function(ev, evdata, ud) {
-  // char *mgos_net_ip_to_str(const struct sockaddr_in *sin, char *out);
-  // let f = ffi('int my_func(int, int)');
-  // print('Calling C my_func:', f(1,2));
-  let gotIp =
-  print('== Net event:', 'GOT_IP', ev, evdata, ud);
 }, null);

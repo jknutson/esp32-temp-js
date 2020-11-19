@@ -17,6 +17,8 @@ config_schema:
   - ["pins.temp", "i", -1, {title: "Temperature sensor GPIO pin"}]
   - ["pins.builtin", "i", 0, {title: "Builtin button"}]
   - ["pins.voltage", "i", -1, {title: "voltage pin"}]
+  - ["pins.voltage_r1", "i", -1, {title: "R1 value (ohms)"}]
+  - ["pins.voltage_r2", "i", -1, {title: "R2 value (ohms)"}]
   - ["datadog", "o", {title: "datadog config"}]
   - ["datadog.api_key", "s", {title: "datadog API key"}]
   - ["datadog.host_name", "s", {title: "datadog host name"}]
