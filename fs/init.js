@@ -7,6 +7,7 @@ load('api_net.js');
 load('api_timer.js');
 load('api_sys.js');
 load('api_ds18b20.js');
+load('api_lcd_i2c.js');
 
 let deviceId = Cfg.get('device.id');
 let deviceType = 'esp32';
@@ -29,11 +30,13 @@ if (voltagePin !== "" && r1 > 0 && r2 > 0) {
 }
 
 // setup LCD
+print('setting up lcd');
 let lcd = LCD_I2C.create(lcdAddr);
 lcd.begin(lcdNumRows, lcdNumCols);
 lcd.clear();
 lcd.setCursor(0, 0);
 lcd.print('starting up...')
+print('lcd setup complete');
 
 print('deviceId:', deviceId)
 
@@ -134,6 +137,8 @@ Timer.set(pollInterval, true, function() {
     print('no oneWire device found')
   }
 
+  let voltage = '???';
+
   if (voltagePin !== "" && r1 > 0 && r2 > 0) {
     // read voltage
     let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
@@ -156,5 +161,5 @@ Timer.set(pollInterval, true, function() {
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print('voltage: ', voltage);
+  lcd.print('voltage: ' + JSON.stringify(voltage));
 }, null);
