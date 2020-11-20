@@ -18,6 +18,10 @@ configure:
 	$(MOS) config-set pins.voltage_r2="${PIN_VOLTAGE_R2}"
 	$(MOS) config-set ds18b20.pin="${PIN_DS18B20}"
 
+configure-i2c:
+	$(MOS) config-set i2c.sda_gpio=26
+	$(MOS) config-set i2c.sdl_gpio=25
+
 reboot:
 	$(MOS) call Sys.Reboot
 

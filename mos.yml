@@ -10,8 +10,8 @@ mongoose_os_version: ${mos.version}
 
 config_schema:
   - ["i2c.enable", true]
-  - ["i2c.sda_gpio", 32]
-  - ["i2c.scl_gpio", 33]
+  # - ["i2c.sda_gpio", 32]
+  # - ["i2c.scl_gpio", 33]
   - ["ds18b20.pin", 33]
   - ["sys.tz_spec", "CST6CDT6,M4.1.0/02:00:00,M10.5.0/02:00:00"]
   - ["interval", "i", 30, {title: "Poll interval (seconds)"}]

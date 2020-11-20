@@ -142,7 +142,7 @@ Timer.set(pollInterval, true, function() {
   if (voltagePin !== "" && r1 > 0 && r2 > 0) {
     // read voltage
     let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
-    let voltage = adcReadVoltage(voltagePin);
+    voltage = adcReadVoltage(voltagePin);
     print('voltage: ', voltage);
     let voltagePayload = {
       series: [
@@ -161,5 +161,5 @@ Timer.set(pollInterval, true, function() {
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print('voltage: ' + JSON.stringify(voltage));
+  lcd.print('voltage: ' + JSON.stringify(voltage) + 'mV');
 }, null);
