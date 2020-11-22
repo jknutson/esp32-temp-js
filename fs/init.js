@@ -113,6 +113,7 @@ Timer.set(pollInterval, true, function() {
   postMetric(datadogApiKey, sysPayload);
 
   // read temperature
+  let temperature = '???';
   if (DS18B20.connected()) {
     let t = DS18B20.get();
     if (isNaN(t)) {
@@ -132,6 +133,7 @@ Timer.set(pollInterval, true, function() {
       };
       print('publishing: ' + JSON.stringify(payload))
       postMetric(datadogApiKey, payload);
+      let temperature = t;
     }
   } else {
     print('no oneWire device found')
@@ -161,5 +163,7 @@ Timer.set(pollInterval, true, function() {
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print('voltage: ' + JSON.stringify(voltage) + 'mV');
+  let message = 'voltage: ' + JSON.stringify(voltage) + 'mV';
+  lcd.print(message);
+  // TODO: print temperature
 }, null);

@@ -19,8 +19,8 @@ configure:
 	$(MOS) config-set ds18b20.pin="${PIN_DS18B20}"
 
 configure-i2c:
-	$(MOS) config-set i2c.sda_gpio=26
-	$(MOS) config-set i2c.sdl_gpio=25
+	$(MOS) config-set i2c.sda_gpio="${PIN_I2C_SDA}"
+	$(MOS) config-set i2c.scl_gpio="${PIN_I2C_SCL}"
 
 reboot:
 	$(MOS) call Sys.Reboot
