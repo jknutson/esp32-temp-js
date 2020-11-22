@@ -37,6 +37,8 @@ lcd.clear();
 lcd.setCursor(0, 0);
 lcd.print('starting up...')
 print('lcd setup complete');
+// lcd.setCursor(0, 1);
+// lcd.print('second line');
 
 print('deviceId:', deviceId)
 
@@ -133,7 +135,7 @@ Timer.set(pollInterval, true, function() {
       };
       print('publishing: ' + JSON.stringify(payload))
       postMetric(datadogApiKey, payload);
-      let temperature = t;
+      temperature = t;
     }
   } else {
     print('no oneWire device found')
@@ -163,7 +165,7 @@ Timer.set(pollInterval, true, function() {
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  let message = 'voltage: ' + JSON.stringify(voltage) + 'mV';
-  lcd.print(message);
-  // TODO: print temperature
+  lcd.print('v:' + JSON.stringify(voltage) + 'mV');
+  lcd.setCursor(0, 1);
+  lcd.print('t:'  + JSON.stringify(temperature) + 'F');
 }, null);
