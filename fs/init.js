@@ -1,5 +1,4 @@
 load('api_adc.js');
-load('api_arduino_onewire.js');
 load('api_config.js');
 load('api_events.js');
 load('api_gpio.js');
@@ -8,22 +7,40 @@ load('api_net.js');
 load('api_timer.js');
 load('api_sys.js');
 load('api_ds18b20.js');
+load('api_lcd_i2c.js');
 
 let deviceId = Cfg.get('device.id');
 let deviceType = 'esp32';
 let metricTags = ['device:' + deviceId, 'deviceType:' + deviceType];
-let oneWirePin = Cfg.get('pins.temp');
-let buttonPin = 0;  // builtin
+let buttonPin = Cfg.get('pins.builtin');  // builtin
+let voltagePin = Cfg.get('pins.voltage');
 let pollInterval = Cfg.get('interval') * 1000;
 let datadogApiKey = Cfg.get('datadog.api_key');
 let datadogHostName = Cfg.get('datadog.host_name');
+let lcdAddr = 0x27;
+let lcdNumRows = 4;
+let lcdNumCols = 20;
 
-let ow = OneWire.create(oneWirePin);
-let n = 0;
-let rom = ['01234567'];
+let r1 = Cfg.get('pins.voltage_r1'); // r1 of voltage divider (ohm)
+let r2 = Cfg.get('pins.voltage_r2'); // r2 of voltage divider (ohm)
+
+if (voltagePin !== "" && r1 > 0 && r2 > 0) {
+  print('voltage reading enabled');
+  ADC.enable(voltagePin);
+}
+
+// setup LCD
+print('setting up lcd');
+let lcd = LCD_I2C.create(lcdAddr);
+lcd.begin(lcdNumRows, lcdNumCols);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print('starting up...')
+print('lcd setup complete');
+// lcd.setCursor(0, 1);
+// lcd.print('second line');
 
 print('deviceId:', deviceId)
-print('oneWirePin:', oneWirePin)
 
 let postMetric = function(datadogApiKey, payload) {
   print('publishing: ' + JSON.stringify(payload))
@@ -37,6 +54,10 @@ let postMetric = function(datadogApiKey, payload) {
       print('datadog post metric error:', err);
     }
   });
+};
+
+let multiplyVoltage = function(rawVoltage, r1, r2) {
+  return (rawVoltage * (r1 + r2) / r2);
 };
 
 GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function(x) {
@@ -67,10 +88,11 @@ GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function
 
 
 Timer.set(pollInterval, true, function() {
+  let now = Timer.now();
+
+  // read system stats
   let totalRam = Sys.total_ram();
   let freeRam = Sys.free_ram();
-
-  let now = Timer.now();
   let sysPayload = {
     series: [
       {
@@ -92,6 +114,8 @@ Timer.set(pollInterval, true, function() {
   print('publishing: ' + JSON.stringify(sysPayload))
   postMetric(datadogApiKey, sysPayload);
 
+  // read temperature
+  let temperature = '???';
   if (DS18B20.connected()) {
     let t = DS18B20.get();
     if (isNaN(t)) {
@@ -111,16 +135,37 @@ Timer.set(pollInterval, true, function() {
       };
       print('publishing: ' + JSON.stringify(payload))
       postMetric(datadogApiKey, payload);
+      temperature = t;
     }
   } else {
     print('no oneWire device found')
   }
-}, null);
 
-Event.addGroupHandler(Net.STATUS_GOT_IP, function(ev, evdata, ud) {
-  // char *mgos_net_ip_to_str(const struct sockaddr_in *sin, char *out);
-  // let f = ffi('int my_func(int, int)');
-  // print('Calling C my_func:', f(1,2));
-  let gotIp =
-  print('== Net event:', 'GOT_IP', ev, evdata, ud);
+  let voltage = '???';
+
+  if (voltagePin !== "" && r1 > 0 && r2 > 0) {
+    // read voltage
+    let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
+    voltage = adcReadVoltage(voltagePin);
+    print('voltage: ', voltage);
+    let voltagePayload = {
+      series: [
+        {
+          metric: 'mos.voltage',
+          points: [[now, multiplyVoltage(voltage, r1, r2)]],
+          host: datadogHostName,
+          tags: metricTags,
+          type: 'gauge'
+        }
+      ]
+    };
+    print('publishing: ' + JSON.stringify(voltagePayload))
+    postMetric(datadogApiKey, voltagePayload);
+  }
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print('v:' + JSON.stringify(voltage) + 'mV');
+  lcd.setCursor(0, 1);
+  lcd.print('t:'  + JSON.stringify(temperature) + 'F');
 }, null);
