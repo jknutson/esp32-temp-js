@@ -14,6 +14,7 @@ let deviceType = 'esp32';
 let metricTags = ['device:' + deviceId, 'deviceType:' + deviceType];
 let buttonPin = Cfg.get('pins.builtin');  // builtin
 let voltagePin = Cfg.get('pins.voltage');
+let photoresistorPin = Cfg.get('pins.photoresistor');
 let pollInterval = Cfg.get('interval') * 1000;
 let datadogApiKey = Cfg.get('datadog.api_key');
 let datadogHostName = Cfg.get('datadog.host_name');
@@ -27,6 +28,11 @@ let r2 = Cfg.get('pins.voltage_r2'); // r2 of voltage divider (ohm)
 if (voltagePin !== "" && r1 > 0 && r2 > 0) {
   print('voltage reading enabled');
   ADC.enable(voltagePin);
+}
+
+if (photoresistorPin > 0) {
+  print('photoresistor reading enabled');
+  ADC.enable(photoresistorPin);
 }
 
 // setup LCD
@@ -141,11 +147,11 @@ Timer.set(pollInterval, true, function() {
     print('no oneWire device found')
   }
 
-  let voltage = '???';
+  let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
 
+  let voltage = '???';
   if (voltagePin !== "" && r1 > 0 && r2 > 0) {
     // read voltage
-    let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
     voltage = adcReadVoltage(voltagePin);
     print('voltage: ', voltage);
     let voltagePayload = {
@@ -163,9 +169,16 @@ Timer.set(pollInterval, true, function() {
     postMetric(datadogApiKey, voltagePayload);
   }
 
+  let lightVal = '???';
+  if (photoresistorPin > 0) {
+    lightVal = adcReadVoltage(photoresistorPin);
+  }
+
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print('v:' + JSON.stringify(voltage) + 'mV');
   lcd.setCursor(0, 1);
   lcd.print('t:'  + JSON.stringify(temperature) + 'F');
+  lcd.setCursor(10, 0);
+  lcd.print('l:'  + JSON.stringify(lightVal));
 }, null);

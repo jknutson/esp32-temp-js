@@ -16,6 +16,7 @@ configure:
 	$(MOS) config-set pins.voltage="${PIN_VOLTAGE}"
 	$(MOS) config-set pins.voltage_r1="${PIN_VOLTAGE_R1}"
 	$(MOS) config-set pins.voltage_r2="${PIN_VOLTAGE_R2}"
+	$(MOS) config-set pins.photoresistor="${PIN_PHOTORESISTOR}"
 	$(MOS) config-set ds18b20.pin="${PIN_DS18B20}"
 
 configure-i2c:

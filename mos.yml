@@ -17,6 +17,7 @@ config_schema:
   - ["interval", "i", 30, {title: "Poll interval (seconds)"}]
   - ["pins", "o", {title: "Pins layout"}]
   - ["pins.builtin", "i", 0, {title: "Builtin button"}]
+  - ["pins.photoresistor", "i", -1, {title: "photoresistor input"}]
   - ["pins.voltage", "i", -1, {title: "voltage pin"}]
   - ["pins.voltage_r1", "i", -1, {title: "R1 value (ohms)"}]
   - ["pins.voltage_r2", "i", -1, {title: "R2 value (ohms)"}]
