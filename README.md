@@ -30,12 +30,12 @@ mos call Sys.Reboot
 
 1. Copy the example .env file to a new file **with the `.local` suffix**
   - The `.local` suffix helps prevent the file (and it's secret contents) from being committed to git
-  ```sh
-  cp .env.example .env.project.local  # .local suffix is important, we will store secrets in this file
-  ```
+    ```sh
+    cp .env.example .env.project.local  # .local suffix is important, we will store secrets in this file
+    ```
 2. Edit the file, placing in appropriate values for your environment
 3. Source the file, and run the relevant make target
-  ```sh
-  source .env.project.local
-  make all
-  ```
+   ```sh
+   source .env.project.local
+   make all
+   ```
