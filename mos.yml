@@ -1,6 +1,6 @@
 ---
 author: John Knutson
-description: app to monitor a kegerator
+description: app to monitor temperature and/or voltage
 platform: esp32
 version: 1.0
 manifest_version: 2017-05-18
@@ -23,7 +23,9 @@ config_schema:
   - ["datadog", "o", {title: "datadog config"}]
   - ["datadog.api_key", "s", {title: "datadog API key"}]
   - ["datadog.host_name", "s", {title: "datadog host name"}]
-
+  - ["mdash.value.enable", true]   # enable this widget
+  - ["mdash.value.title", "Temp:"]
+  - ["mdash.value.key", "state.reported.temp"]
 conds:
   - when: mos.platform == "esp32"
     apply:

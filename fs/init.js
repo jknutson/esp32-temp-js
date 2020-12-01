@@ -1,5 +1,6 @@
 load('api_adc.js');
 load('api_config.js');
+load('api_dash.js');
 load('api_events.js');
 load('api_gpio.js');
 load('api_http.js');
@@ -84,6 +85,16 @@ GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function
       print('datadog post event error:', err);
     }
   });
+
+  Dash.notify('esp32 device button pressed');
+}, null);
+
+// mdash
+let createMDashUI = ffi('void create_mdash_ui()');
+let mDashConfigSet = ffi('int mDashConfigSet(char, char)');
+Event.addHandler(Event.CLOUD_CONNECTED, function(ev, evdata, ud) {
+  print('cloud connected, creating UI');
+  createMDashUI();
 }, null);
 
 
@@ -135,6 +146,7 @@ Timer.set(pollInterval, true, function() {
       };
       print('publishing: ' + JSON.stringify(payload))
       postMetric(datadogApiKey, payload);
+      mDashConfigSet('state.reported.temp', JSON.stringify(t));
       temperature = t;
     }
   } else {
