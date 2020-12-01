@@ -47,6 +47,7 @@ libs:
   - origin: https://github.com/mongoose-os-libs/ds18b20
   - origin: https://github.com/mongoose-os-libs/i2c
   - origin: https://github.com/mongoose-os-libs/mdash-api
+  - origin: https://github.com/mongoose-os-libs/dash
   - origin: https://github.com/mongoose-os-libs/mjs
   - origin: https://github.com/mongoose-os-libs/adc
   - origin: https://github.com/mongoose-os-libs/atca
