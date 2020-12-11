@@ -58,6 +58,8 @@ GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function
 Timer.set(pollInterval, true, function() {
   let now = Timer.now();
 
+  // TODO: use sample library, collect a number of frequent samples and emit min, max, mean, etc.
+
   // read temperature
   let temperature = '???';
   if (DS18B20.connected()) {
