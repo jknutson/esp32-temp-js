@@ -1,6 +1,6 @@
 ---
 author: John Knutson
-description: app to monitor a kegerator
+description: app to monitor temperature & voltage 
 platform: esp32
 version: 1.0
 manifest_version: 2017-05-18
@@ -18,9 +18,12 @@ config_schema:
   - ["interval", "i", 30, {title: "Poll interval (seconds)"}]
   - ["pins", "o", {title: "Pins layout"}]
   - ["pins.builtin", "i", 0, {title: "Builtin button"}]
-  - ["pins.voltage", "i", -1, {title: "voltage pin"}]
-  - ["pins.voltage_r1", "i", -1, {title: "R1 value (ohms)"}]
-  - ["pins.voltage_r2", "i", -1, {title: "R2 value (ohms)"}]
+  - ["pins.voltage", "i", 34, {title: "voltage pin"}]
+  - ["pins.voltage_r1", "i", 10000, {title: "R1 value (ohms)"}]
+  - ["pins.voltage_r2", "i", 2200, {title: "R2 value (ohms)"}]
+  # - ["pins.voltage", "i", -1, {title: "voltage pin"}]
+  # - ["pins.voltage_r1", "i", -1, {title: "R1 value (ohms)"}]
+  # - ["pins.voltage_r2", "i", -1, {title: "R2 value (ohms)"}]
   - ["datadog", "o", {title: "datadog config"}]
   - ["datadog.api_key", "s", {title: "datadog API key"}]
   - ["datadog.host_name", "s", {title: "datadog host name"}]

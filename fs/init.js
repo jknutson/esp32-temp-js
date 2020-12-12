@@ -28,6 +28,8 @@ let r2 = Cfg.get('pins.voltage_r2'); // r2 of voltage divider (ohm)
 // Initialize OneWire library
 let ow = OneWire.create(33 /* pin */);  // TODO: get from Cfg
 
+let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
+
 // Number of sensors found on the 1-Wire bus
 let n = 0;
 // Sensors addresses
@@ -117,10 +119,13 @@ Timer.set(pollInterval, true, function() {
   // read voltage
   let voltage = '???';
   if (voltagePin !== "" && r1 > 0 && r2 > 0) {
-    let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
     voltage = adcReadVoltage(voltagePin);
-    print('voltage: ', voltage);
-    let res = MQTT.pub('esp32/' + deviceId + '/voltage/pin' + voltagePin, JSON.stringify(voltage));
+    print('raw voltage: ', voltage, 'mV');
+    let realVoltage = multiplyVoltage(voltage, r1, r2);
+    print('real voltage: ', realVoltage, 'mV');
+    let topic = 'esp32/' + deviceId + '/voltage/pin' + JSON.stringify(voltagePin);
+    print('topic: ', topic);
+    let res = MQTT.pub(topic, JSON.stringify(realVoltage));
     print('MQTT Published (polled voltage):', res ? 'yes' : 'no');
   }
 
