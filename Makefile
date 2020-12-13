@@ -3,7 +3,7 @@ MOS=mos
 .PHONY: all build flash configure reboot
 
 build:
-	$(MOS) build
+	$(MOS) build --platform esp32
 
 flash:
 	$(MOS) flash

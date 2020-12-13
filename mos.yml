@@ -24,6 +24,7 @@ config_schema:
   - ["pins.voltage", "i", -1, {title: "voltage pin"}]
   - ["pins.voltage_r1", "i", -1, {title: "R1 value (ohms)"}]
   - ["pins.voltage_r2", "i", -1, {title: "R2 value (ohms)"}]
+  - ["pins.ds18b20", "i", 33, {title: "ds18b20 pin"}]
   - ["datadog", "o", {title: "datadog config"}]
   - ["datadog.api_key", "s", {title: "datadog API key"}]
   - ["datadog.host_name", "s", {title: "datadog host name"}]
@@ -50,24 +51,18 @@ filesystem:
 
 libs:
   - origin: https://github.com/mongoose-os-libs/ca-bundle
-  - origin: https://github.com/mongoose-os-libs/dht
-  # - origin: https://github.com/mongoose-os-libs/dns-sd
   - origin: https://github.com/mongoose-os-libs/ds18b20
   - origin: https://github.com/mongoose-os-libs/i2c
-  - origin: https://github.com/mongoose-os-libs/mdash-api
   - origin: https://github.com/mongoose-os-libs/mqtt
   - origin: https://github.com/mongoose-os-libs/dash
   - origin: https://github.com/mongoose-os-libs/mjs
   - origin: https://github.com/mongoose-os-libs/adc
-  - origin: https://github.com/mongoose-os-libs/atca
   - origin: https://github.com/mongoose-os-libs/sntp
-  - origin: https://github.com/mongoose-os-libs/ethernet
   - origin: https://github.com/mongoose-os-libs/arduino-onewire
   - origin: https://github.com/mongoose-os-libs/rpc-uart
   - origin: https://github.com/mongoose-os-libs/rpc-service-config
   - origin: https://github.com/mongoose-os-libs/rpc-service-fs
   - origin: https://github.com/mongoose-os-libs/rpc-service-wifi
   - origin: https://github.com/mongoose-os-libs/spi
-  - origin: https://github.com/mongoose-os-libs/vfs-dev-spi-flash
   - origin: https://github.com/mongoose-os-libs/wifi
   - origin: https://github.com/kzyapkov/liquidcrystal-i2c

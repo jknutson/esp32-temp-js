@@ -1,12 +1,6 @@
 load('api_adc.js');
 load('api_config.js');
-load('api_events.js');
-load('api_gpio.js');
-load('api_http.js');
-load('api_net.js');
 load('api_timer.js');
-load('api_sys.js');
-// load('api_ds18b20.js');
 load('api_arduino_onewire.js');
 load('api_lcd_i2c.js');
 load('api_mqtt.js');
@@ -16,6 +10,7 @@ let deviceId = Cfg.get('device.id');
 let deviceType = 'esp32';
 let buttonPin = Cfg.get('pins.builtin');  // builtin
 let voltagePin = Cfg.get('pins.voltage');
+let ds18b20Pin = Cfg.get('pins.ds18b20');
 let pollInterval = Cfg.get('interval') * 1000;
 let lcdAddr = 0x27;
 let lcdNumRows = 4;
@@ -26,7 +21,7 @@ let r2 = Cfg.get('pins.voltage_r2'); // r2 of voltage divider (ohm)
 
 // setup onewire/ds18b20
 // Initialize OneWire library
-let ow = OneWire.create(33 /* pin */);  // TODO: get from Cfg
+let ow = OneWire.create(ds18b20Pin);
 
 let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
 
@@ -79,12 +74,6 @@ print('deviceId:', deviceId);
 let multiplyVoltage = function(rawVoltage, r1, r2) {
   return (rawVoltage * (r1 + r2) / r2);
 };
-
-GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function(x) {
-  // builtin button pressed
-  let res = MQTT.pub('esp32/' + deviceId + '/events/buttonPushed', buttonPin);
-  print('MQTT Published (button pushed):', res ? 'yes' : 'no');
-}, null);
 
 Timer.set(pollInterval, true, function() {
   let now = Timer.now();
