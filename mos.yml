@@ -2,7 +2,7 @@
 author: John Knutson
 description: app to monitor temperature & voltage 
 platform: esp32
-version: 1.0
+version: 1.1
 manifest_version: 2017-05-18
 libs_version: ${mos.version}
 modules_version: ${mos.version}
@@ -12,12 +12,10 @@ config_schema:
   - ["i2c.enable", true]
   - ["i2c.sda_gpio", 32]
   - ["i2c.scl_gpio", 25]  # default (33) ds18b20, prefer 25
-  - ["ds18b20.pin", 33]
-  - ["ds18b20.poll_interval", -1]  # disable polling, we do our own
   - ["sys.tz_spec", "CST6CDT6,M4.1.0/02:00:00,M10.5.0/02:00:00"]
   - ["interval", "i", 30, {title: "Poll interval (seconds)"}]
   - ["pins", "o", {title: "Pins layout"}]
-  - ["pins.builtin", "i", 0, {title: "Builtin button"}]
+  - ["pins.builtin", "i", 0, {title: "Builtin button (ESP32)"}]
   # - ["pins.voltage", "i", 34, {title: "voltage pin"}]
   # - ["pins.voltage_r1", "i", 10000, {title: "R1 value (ohms)"}]
   # - ["pins.voltage_r2", "i", 2200, {title: "R2 value (ohms)"}]
@@ -25,16 +23,6 @@ config_schema:
   - ["pins.voltage_r1", "i", -1, {title: "R1 value (ohms)"}]
   - ["pins.voltage_r2", "i", -1, {title: "R2 value (ohms)"}]
   - ["pins.ds18b20", "i", 33, {title: "ds18b20 pin"}]
-  - ["datadog", "o", {title: "datadog config"}]
-  - ["datadog.api_key", "s", {title: "datadog API key"}]
-  - ["datadog.host_name", "s", {title: "datadog host name"}]
-
-conds:
-  - when: mos.platform == "esp32"
-    apply:
-      config_schema:
-        - ["pins.temp", 33]
-        - ["pins.builtin", 0]
 
 build_vars:
   ESP_IDF_SDKCONFIG_OPTS: >
@@ -43,15 +31,11 @@ build_vars:
 tags:
   - js
 
-sources:
-  - src
-
 filesystem:
   - fs
 
 libs:
   - origin: https://github.com/mongoose-os-libs/ca-bundle
-  - origin: https://github.com/mongoose-os-libs/ds18b20
   - origin: https://github.com/mongoose-os-libs/i2c
   - origin: https://github.com/mongoose-os-libs/mqtt
   - origin: https://github.com/mongoose-os-libs/dash
