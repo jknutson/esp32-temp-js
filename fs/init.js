@@ -108,7 +108,7 @@ Timer.set(pollInterval, true, function() {
       print('temperature (c): ' + JSON.stringify(t));
       let t_f = (t * 1.8) + 32;
       print('temperature (f): ' + JSON.stringify(t_f));
-      let topic = 'esp32/' + deviceId + '/temperature/' + tempSensorId;
+      let topic = 'esp32/' + deviceId + '-' + tempSensorId + '/temperature';
       print('topic: ', topic);
       let res = MQTT.pub(topic, JSON.stringify(t_f));
       print('MQTT Published (polled temperature):', res ? 'yes' : 'no');

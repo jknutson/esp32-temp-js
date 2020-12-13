@@ -70,6 +70,10 @@ function getTemp(ow, rom) {
   } else if (cfg === REG_CONF.RESOLUTION_11BIT) {
     raw = raw & ~1;
   }
+
+  if ((raw & 0x8000) > 0) {
+    raw = raw - 0x10000;
+  }
   // Default resolution is 12 bit
 
   return raw / 16.0;
