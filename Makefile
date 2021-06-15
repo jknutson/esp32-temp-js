@@ -3,7 +3,7 @@ MOS=mos
 .PHONY: all build flash configure reboot
 
 build:
-	$(MOS) build
+	$(MOS) build --platform esp32
 
 flash:
 	$(MOS) flash
@@ -30,7 +30,10 @@ configure-i2c:
 		i2c.scl_gpio="${PIN_I2C_SCL}"
 
 configure-mdash:
-	 $(MOS) config-set dash.enable=true dash.token="${MDASH_TOKEN}" mdash.device_id="${DD_HOSTNAME}"
+	 $(MOS) config-set dash.enable=true dash.token="${MDASH_TOKEN}"
+
+configure-mqtt:
+	$(MOS) config-set mqtt.enable=true mqtt.server=192.168.2.6
 
 configure-mqtt:
 	$(MOS) config-set mqtt.enable=true mqtt.server=192.168.2.6
