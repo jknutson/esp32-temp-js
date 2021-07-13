@@ -1,6 +1,6 @@
 ---
 author: John Knutson
-description: app to monitor temperature & voltage 
+description: app to monitor temperature & voltage
 platform: esp32
 version: 1.1
 manifest_version: 2017-05-18
