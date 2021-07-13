@@ -20,10 +20,9 @@ configure-datadog:
 		datadog.host_name="${DD_HOSTNAME}" \
 
 configure-voltage:
-	$(MOS) pins.voltage="${PIN_VOLTAGE}" \
+	$(MOS) config-set pins.voltage="${PIN_VOLTAGE}" \
 		pins.voltage_r1="${PIN_VOLTAGE_R1}" \
 		pins.voltage_r2="${PIN_VOLTAGE_R2}" \
-
 
 configure-i2c:
 	$(MOS) config-set i2c.sda_gpio="${PIN_I2C_SDA}" \
@@ -33,7 +32,7 @@ configure-mdash:
 	 $(MOS) config-set dash.enable=true dash.token="${MDASH_TOKEN}"
 
 configure-mqtt:
-	$(MOS) config-set mqtt.enable=true mqtt.server=192.168.2.6
+	$(MOS) config-set mqtt.enable=true mqtt.server="${MQTT_SERVER}"
 
 reboot:
 	$(MOS) call Sys.Reboot
