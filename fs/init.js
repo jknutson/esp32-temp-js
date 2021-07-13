@@ -1,9 +1,10 @@
 load('api_adc.js');
-load('api_config.js');
-load('api_timer.js');
 load('api_arduino_onewire.js');
+load('api_config.js');
+load('api_gpio.js');
 load('api_lcd_i2c.js');
 load('api_mqtt.js');
+load('api_timer.js');
 load('ds18b20.js');
 
 let deviceId = Cfg.get('device.id');
@@ -81,7 +82,7 @@ GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function
   // builtin button pressed
   let res = MQTT.pub('esp32/' + deviceId + '/events/buttonPushed', buttonPin);
   print('MQTT Published (button pushed):', res ? 'yes' : 'no');
-}null);
+}, null);
 
 Timer.set(pollInterval, true, function() {
   let now = Timer.now();
