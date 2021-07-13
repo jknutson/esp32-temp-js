@@ -15,6 +15,8 @@ let pollInterval = Cfg.get('interval') * 1000;
 let lcdAddr = 0x27;
 let lcdNumRows = 4;
 let lcdNumCols = 20;
+// planning for future multi-sensor support
+let tempSensorId = 'ds18b20';
 
 let r1 = Cfg.get('pins.voltage_r1'); // r1 of voltage divider (ohm)
 let r2 = Cfg.get('pins.voltage_r2'); // r2 of voltage divider (ohm)
@@ -75,6 +77,12 @@ let multiplyVoltage = function(rawVoltage, r1, r2) {
   return (rawVoltage * (r1 + r2) / r2);
 };
 
+GPIO.set_button_handler(buttonPin, GPIO.PULL_UP, GPIO.INT_EDGE_NEG, 50, function(x) {
+  // builtin button pressed
+  let res = MQTT.pub('esp32/' + deviceId + '/events/buttonPushed', buttonPin);
+  print('MQTT Published (button pushed):', res ? 'yes' : 'no');
+}null);
+
 Timer.set(pollInterval, true, function() {
   let now = Timer.now();
 
@@ -94,12 +102,9 @@ Timer.set(pollInterval, true, function() {
       print('No device found');
       break;
     } else {
-      print('temperature (c): ' + JSON.stringify(t));
       let t_f = (t * 1.8) + 32;
-      print('temperature (f): ' + JSON.stringify(t_f));
-      let topic = 'esp32/' + deviceId + '-' + tempSensorId + '/temperature';
-      print('topic: ', topic);
-      let res = MQTT.pub(topic, JSON.stringify(t_f));
+      print('temperature (c): ' + JSON.stringify(t));
+      let res = MQTT.pub('esp32/' + deviceId + '/temperature/' + tempSensorId, JSON.stringify(t_f));
       print('MQTT Published (polled temperature):', res ? 'yes' : 'no');
       temperature = t_f;
     }
@@ -108,13 +113,10 @@ Timer.set(pollInterval, true, function() {
   // read voltage
   let voltage = '???';
   if (voltagePin !== "" && r1 > 0 && r2 > 0) {
+    let adcReadVoltage = ffi('int mgos_adc_read_voltage(int)');
     voltage = adcReadVoltage(voltagePin);
-    print('raw voltage: ', voltage, 'mV');
-    let realVoltage = multiplyVoltage(voltage, r1, r2);
-    print('real voltage: ', realVoltage, 'mV');
-    let topic = 'esp32/' + deviceId + '/voltage/pin' + JSON.stringify(voltagePin);
-    print('topic: ', topic);
-    let res = MQTT.pub(topic, JSON.stringify(realVoltage));
+    print('voltage: ', voltage);
+    let res = MQTT.pub('esp32/' + deviceId + '/voltage/pin' + voltagePin, JSON.stringify(voltage));
     print('MQTT Published (polled voltage):', res ? 'yes' : 'no');
   }
 

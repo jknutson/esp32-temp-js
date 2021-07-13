@@ -12,6 +12,8 @@ config_schema:
   - ["i2c.enable", true]
   - ["i2c.sda_gpio", 32]
   - ["i2c.scl_gpio", 25]  # default (33) ds18b20, prefer 25
+  - ["ds18b20.pin", 33]
+  - ["ds18b20.poll_interval", -1]  # disable polling, we do our own
   - ["sys.tz_spec", "CST6CDT6,M4.1.0/02:00:00,M10.5.0/02:00:00"]
   - ["interval", "i", 30, {title: "Poll interval (seconds)"}]
   - ["pins", "o", {title: "Pins layout"}]
@@ -37,6 +39,7 @@ filesystem:
 libs:
   - origin: https://github.com/mongoose-os-libs/ca-bundle
   - origin: https://github.com/mongoose-os-libs/i2c
+  - origin: https://github.com/mongoose-os-libs/mdash-api
   - origin: https://github.com/mongoose-os-libs/mqtt
   - origin: https://github.com/mongoose-os-libs/dash
   - origin: https://github.com/mongoose-os-libs/mjs
