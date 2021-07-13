@@ -2,7 +2,6 @@ load('api_adc.js');
 load('api_config.js');
 load('api_timer.js');
 load('api_arduino_onewire.js');
-load('api_lcd_i2c.js');
 load('api_mqtt.js');
 load('ds18b20.js');
 
@@ -67,7 +66,7 @@ Timer.set(pollInterval, true, function() {
       let t_f = (t * 1.8) + 32;
       print('temperature (f): ' + JSON.stringify(t_f));
       let topic = 'esp32/' + deviceId + '-' + tempSensorId + '/temperature';
-      print('topic: ', topic);
+      print('MQTT topic: ', topic);
       let res = MQTT.pub(topic, JSON.stringify(t_f));
       print('MQTT Published (polled temperature):', res ? 'yes' : 'no');
       temperature = t_f;
@@ -81,7 +80,7 @@ Timer.set(pollInterval, true, function() {
     print('raw voltage: ', voltage, 'mV');
     let realVoltage = multiplyVoltage(voltage, r1, r2);
     print('real voltage: ', realVoltage, 'mV');
-    let topic = 'esp32/' + deviceId + '/voltage/pin' + JSON.stringify(voltagePin);
+    let topic = 'esp32/' + deviceId + '/voltage';
     print('topic: ', topic);
     let res = MQTT.pub(topic, JSON.stringify(realVoltage));
     print('MQTT Published (polled voltage):', res ? 'yes' : 'no');
